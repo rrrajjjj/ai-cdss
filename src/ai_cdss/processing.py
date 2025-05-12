@@ -409,7 +409,8 @@ def apply_savgol_filter_groupwise(series, window_size, polyorder):
         return series
 
 
-def get_rolling_theilsen_slope(series_y, series_x, window_size):
+def get_rolling_theilsen_slope(series_y, window_size):
+    series_x = pd.Series(np.arange(len(series_y)))
     slopes = pd.Series([np.nan] * len(series_y), index=series_y.index)
     if len(series_y) < 2 : return slopes
     regressor = TheilSenRegressor(random_state=42, max_subpopulation=1000)

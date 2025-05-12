@@ -117,11 +117,10 @@ class DataProcessor:
         return scored_data
     
     def preprocess_timeseries(self, timeseries_data: pd.DataFrame) -> pd.DataFrame:
-        timeseries_data['session_index'] = timeseries_data.groupby(BY_PP).cumcount() + 1
         timeseries_data = timeseries_data.groupby(BY_PPS).agg({DM_VALUE:"mean", PE_VALUE:"mean"}).reset_index()
         timeseries_data['DM_SMOOTH'] = timeseries_data.groupby(by=BY_PP)[DM_VALUE].transform(apply_savgol_filter_groupwise, SAVGOL_WINDOW_SIZE, SAVGOL_POLY_ORDER)
         timeseries_data['DM_VALUE'] = timeseries_data.groupby(by=BY_PP, group_keys=False).apply(
-            lambda g: get_rolling_theilsen_slope(g['DM_SMOOTH'], g['session_index'], THEILSON_REGRESSION_WINDOW_SIZE)
+            lambda g: get_rolling_theilsen_slope(g['DM_SMOOTH'], THEILSON_REGRESSION_WINDOW_SIZE)
         ).fillna(0)
     
         # Drop DM_SMOOTH column
